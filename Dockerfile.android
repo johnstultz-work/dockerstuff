@@ -1,3 +1,6 @@
+#
+# Dockerfile.android: Android build environment
+#
 FROM ubuntu:14.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm

@@ -1,3 +1,6 @@
+#
+# Dockerfile.kernel: Multi-arch Kernel Build environment
+#
 FROM ubuntu:14.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm
@@ -19,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 # Add jstultz user
 RUN useradd -m jstultz
 
-# Add cross-build scripts
+# Add cross-build environment scripts
 RUN mkdir /home/jstultz/bin
 RUN echo '#!/bin/bash' > /home/jstultz/bin/armenv.sh
 RUN echo 'export ARCH="arm"' >> /home/jstultz/bin/armenv.sh
