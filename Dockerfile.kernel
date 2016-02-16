@@ -1,0 +1,35 @@
+FROM ubuntu:14.04
+MAINTAINER John Stultz <john.stultz@linaro.org>
+ENV TERM xterm
+# Update the image to the lastest updates
+RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
+# Get tools
+RUN apt-get update && apt-get install -y  software-properties-common
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update && apt-get install -y \
+	bc \
+	gcc \
+	gcc-arm-linux-gnueabi \
+	gcc-aarch64-linux-gnu \
+	libncurses5-dev \
+	make \
+	python
+
+
+# Add jstultz user
+RUN useradd -m jstultz
+
+# Add cross-build scripts
+RUN mkdir /home/jstultz/bin
+RUN echo '#!/bin/bash' > /home/jstultz/bin/armenv.sh
+RUN echo 'export ARCH="arm"' >> /home/jstultz/bin/armenv.sh
+RUN echo 'export CROSS_COMPILE="arm-linux-gnueabi-"' >> /home/jstultz/bin/armenv.sh
+RUN echo 'bash' >>  /home/jstultz/bin/armenv.sh
+RUN chmod +x /home/jstultz/bin/armenv.sh
+
+RUN echo '#!/bin/bash' > /home/jstultz/bin/arm64env.sh
+RUN echo 'export ARCH="arm64"' >> /home/jstultz/bin/arm64env.sh
+RUN echo 'export CROSS_COMPILE="aarch64-linux-gnu-"' >> /home/jstultz/bin/arm64env.sh
+RUN echo 'bash' >>  /home/jstultz/bin/arm64env.sh
+RUN chmod +x /home/jstultz/bin/arm64env.sh
+
