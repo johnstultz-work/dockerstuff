@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
 	libx11-dev \
 	libxml2-utils \
 	make \
+	mtools \
 	openjdk-8-jdk \
 	python \
 	unzip \
@@ -42,4 +43,4 @@ RUN apt-get update && apt-get install -y \
 	zlib1g-dev
 
 RUN useradd -m jstultz
-
+RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/jstultz/.bashrc
