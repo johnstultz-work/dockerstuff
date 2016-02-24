@@ -1,0 +1,22 @@
+#
+# Dockerfile.kernel: Multi-arch Kernel Build environment
+#
+FROM ubuntu:14.04
+MAINTAINER John Stultz <john.stultz@linaro.org>
+ENV TERM xterm
+# Update the image to the lastest updates
+RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
+# Get tools
+RUN apt-get update && apt-get install -y \
+	bc \
+	gcc \
+	libncurses5-dev \
+	make \
+	python \
+	sudo
+
+
+# Add jstultz user
+RUN useradd -m jstultz && echo "jstultz:docker" | chpasswd && adduser jstultz sudo
+
+
