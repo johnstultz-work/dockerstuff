@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y \
 	mtools \
 	openjdk-8-jdk \
 	python \
+	python-mako \
 	unzip \
 	x11proto-core-dev \
 	xsltproc \
