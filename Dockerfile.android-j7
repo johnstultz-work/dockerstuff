@@ -16,12 +16,12 @@ RUN apt-get update && apt-get install -y \
 	curl \
 	dosfstools \
 	flex \
+	g++-multilib \
 	gcc \
+	gcc-multilib \
 	gettext \
 	git-core \
 	gnupg \
-	gcc-multilib \
-	g++-multilib \
 	gperf \
 	lib32ncurses5-dev \
 	lib32z-dev \
@@ -40,5 +40,10 @@ RUN apt-get update && apt-get install -y \
 	zip \
 	zlib1g-dev
 
-RUN useradd -m jstultz
-RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/jstultz/.bashrc
+# make username a variable, so the script is portable
+# add '--build-arg user_name=$USER' to the docker build command
+ARG --description="user name for container" user_name
+RUN useradd -m $user_name
+USER $user_name
+
+RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/$user_name/.bashrc
