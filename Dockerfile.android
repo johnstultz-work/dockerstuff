@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y \
 
 # make username a variable, so the script is portable
 # add '--build-arg user_name=$USER' to the docker build command
-ARG --description="user name for container" user_name
+ARG --description="user name for container" user_name=docker
 RUN useradd -m $user_name
 USER $user_name
 
