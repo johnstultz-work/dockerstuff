@@ -1,5 +1,5 @@
 #
-# Dockerfile.kernel: Multi-arch Kernel Build environment
+# Dockerfile.ubuntu-dev: General Ubuntu dev eenvironment w/ sudo rights
 #
 FROM ubuntu:14.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
@@ -15,8 +15,12 @@ RUN apt-get update && apt-get install -y \
 	python \
 	sudo
 
+# make username a variable, so the script is portable
+# add '--build-arg user_name=$USER' to the docker build command
+ARG --description="user name for container" user_name=docker
 
-# Add jstultz user
-RUN useradd -m jstultz && echo "jstultz:docker" | chpasswd && adduser jstultz sudo
+# Add $user_name user
+RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
+USER $user_name
 
 
