@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 	g++-multilib \
 	gcc \
 	gcc-multilib \
-	gettext
+	gettext \
 	git-core \
 	gnupg \
 	gperf \
