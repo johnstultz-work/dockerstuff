@@ -1,0 +1,33 @@
+#
+# Dockerfile.kernel: Multi-arch Kernel Build environment
+#
+FROM ubuntu:14.04
+MAINTAINER John Stultz <john.stultz@linaro.org>
+ENV TERM xterm
+# Update the image to the lastest updates
+RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
+# Get tools
+RUN apt-get update && apt-get install -y \
+	bc \
+	gcc \
+	gcc-arm-linux-gnueabi \
+	gcc-aarch64-linux-gnu \
+	gcc-4.8-arm-linux-gnueabihf \
+	gdisk \
+	g++ \
+	libncurses5-dev \
+	make \
+	python \
+	python-pycurl \
+	python-crypto \
+	uuid-dev \
+	sudo
+
+# make username a variable, so the script is portable
+# add '--build-arg user_name=$USER' to the docker build command
+ARG --description="user name for container" user_name=docker
+
+# Add $user_name user
+RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
+USER $user_name
+
