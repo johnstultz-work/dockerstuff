@@ -1,0 +1,38 @@
+#
+# Dockerfile.ubuntu-dev: General Ubuntu dev eenvironment w/ sudo rights
+#
+FROM ubuntu:16.04
+MAINTAINER John Stultz <john.stultz@linaro.org>
+ENV TERM xterm
+# Update the image to the lastest updates
+RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
+# Get tools
+RUN apt-get update && apt-get install -y \
+	bc \
+	gcc \
+	libncurses5-dev \
+	make \
+	python \
+	sudo \
+	build-essential autoconf automake libtool pkg-config \
+	trace-cmd sshpass kernelshark \
+	nmap net-tools tree \
+	python-matplotlib python-numpy libfreetype6-dev libpng12-dev python-nose \
+	python-pip python-dev \
+	git
+
+RUN pip install --upgrade trappy bart-py devlib psutil
+RUN apt-get -y remove ipython ipython-notebook
+RUN pip install  ipython jupyter
+
+EXPOSE 8888
+# make username a variable, so the script is portable
+# add '--build-arg user_name=$USER' to the docker build command
+ARG --description="user name for container" user_name=docker
+
+# Add $user_name user
+RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
+USER $user_name
+
+RUN cd ~/ && git clone https://github.com/ARM-software/lisa.git
+
