@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 	nmap net-tools tree \
 	python-matplotlib python-numpy libfreetype6-dev libpng12-dev python-nose \
 	python-pip python-dev \
-	git
+	git adb
 
 RUN pip install --upgrade trappy bart-py devlib psutil
 RUN apt-get -y remove ipython ipython-notebook
