@@ -1,7 +1,7 @@
 #
 # Dockerfile.kernel: Multi-arch Kernel Build environment
 #
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm
 # Update the image to the lastest updates
