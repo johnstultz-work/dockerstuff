@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
 	flex \
 	g++-multilib \
 	gcc \
+	gcc-4.8 \
 	gcc-multilib \
 	gettext \
 	git-core \
