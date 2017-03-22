@@ -29,3 +29,17 @@ ADD https://dl.google.com/dl/android/cts/android-cts-7.1_r1-linux_x86-arm.zip /h
 RUN chown $user_name.$user_name /home/$user_name/android-cts*
 
 USER $user_name
+
+RUN	cd ~/ && \
+	echo '#!/bin/bash'		>> cts-x86.sh && \
+	echo 'cd ~/'			>> cts-x86.sh && \
+	echo 'unzip android-cts-7.1_r1-linux_x86-x86.zip' >> cts-x86.sh && \
+	echo './android-cts/tools/cts-tradefed run cts'	>> cts-x86.sh && \
+	chmod +x cts-x86.sh
+
+RUN	cd ~/ && \
+	echo '#!/bin/bash'		>> cts-arm.sh && \
+	echo 'cd ~/'			>> cts-arm.sh && \
+	echo 'unzip android-cts-7.1_r1-linux_x86-arm.zip' >> cts-arm.sh && \
+	echo './android-cts/tools/cts-tradefed run cts' >> cts-arm.sh && \
+	chmod +x cts-arm.sh
