@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y \
 	lib32z-dev \
 	libc6-dev-i386 \
 	libgl1-mesa-dev \
+	libssl-dev \
 	libx11-dev \
 	libxml2-utils \
 	make \
