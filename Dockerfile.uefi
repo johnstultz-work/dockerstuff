@@ -14,8 +14,10 @@ RUN apt-get update && apt-get install -y \
 	gcc-aarch64-linux-gnu \
 	gcc-4.8-arm-linux-gnueabihf \
 	gdisk \
+	git \
 	g++ \
 	libncurses5-dev \
+	libssl-dev \
 	make \
 	python \
 	python-pycurl \
@@ -31,4 +33,39 @@ ARG --description="user name for container" user_name=docker
 # Add $user_name user
 RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
 USER $user_name
+
+RUN cd ~ && mkdir uefi-code && cd uefi-code && \
+	git clone https://github.com/ARM-software/arm-trusted-firmware.git && \
+	git clone -b testing/hikey960_v2.5 https://github.com/96boards-hikey/edk2.git && \
+	git clone -b testing/hikey960_v1.3.4 https://github.com/96boards-hikey/OpenPlatformPkg.git && \
+	git clone -b testing/hikey960_v1.2 https://github.com/96boards-hikey/l-loader.git && \
+	git clone https://git.linaro.org/uefi/uefi-tools.git && \
+	git clone https://github.com/96boards-hikey/atf-fastboot.git
+
+RUN	cd ~/uefi-code/edk2 && ln -sf ../OpenPlatformPkg
+
+RUN	cd ~/uefi-code/ && \
+	echo 'BUILD_PATH=~/uefi-code/' > build_uefi.sh &&\
+	echo 'BUILD_OPTION=DEBUG' >> build_uefi.sh &&\
+	echo 'export AARCH64_TOOLCHAIN=GCC5' >> build_uefi.sh &&\
+	echo 'export UEFI_TOOLS_DIR=${BUILD_PATH}/uefi-tools' >> build_uefi.sh &&\
+	echo 'export EDK2_DIR=${BUILD_PATH}/edk2' >> build_uefi.sh &&\
+	echo 'EDK2_OUTPUT_DIR=${EDK2_DIR}/Build/HiKey/${BUILD_OPTION}_${AARCH64_TOOLCHAIN}' >> build_uefi.sh &&\
+	echo '# Build fastboot for ARM Trust Firmware. Its used for recovery mode.' >> build_uefi.sh &&\
+	echo 'cd ${BUILD_PATH}/atf-fastboot' >> build_uefi.sh &&\
+	echo 'CROSS_COMPILE=aarch64-linux-gnu- make PLAT=hikey DEBUG=1' >> build_uefi.sh &&\
+	echo '# Convert DEBUG/RELEASE to debug/release' >> build_uefi.sh  && \
+	echo 'FASTBOOT_BUILD_OPTION=$(echo ${BUILD_OPTION} | tr "[A-Z]" "[a-z]")' >> build_uefi.sh &&\
+	echo 'cd ${EDK2_DIR}' >> build_uefi.sh &&\
+	echo '# Build UEFI & ARM Trust Firmware' >> build_uefi.sh &&\
+	echo '${UEFI_TOOLS_DIR}/uefi-build.sh -b ${BUILD_OPTION} -a ../arm-trusted-firmware hikey' >> build_uefi.sh &&\
+	echo '# Generate l-loader.bin' >> build_uefi.sh &&\
+	echo 'cd ${BUILD_PATH}/l-loader' >> build_uefi.sh &&\
+	echo 'ln -sf ${EDK2_OUTPUT_DIR}/FV/bl1.bin' >> build_uefi.sh &&\
+	echo 'ln -sf ${BUILD_PATH}/atf-fastboot/build/hikey/${FASTBOOT_BUILD_OPTION}/bl1.bin fastboot.bin' >> build_uefi.sh &&\
+	echo 'arm-linux-gnueabihf-gcc -c -o start.o start.S' >> build_uefi.sh &&\
+	echo 'arm-linux-gnueabihf-ld -Bstatic -Tl-loader.lds -Ttext 0xf9800800 start.o -o loader' >> build_uefi.sh &&\
+	echo 'arm-linux-gnueabihf-objcopy -O binary loader temp' >> build_uefi.sh &&\
+	echo 'python gen_loader_hikey.py -o l-loader.bin --img_loader=temp --img_bl1=bl1.bin --img_ns_bl1u=fastboot.bin' >> build_uefi.sh &&\
+	chmod +x build_uefi.sh
 
