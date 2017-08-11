@@ -69,3 +69,5 @@ RUN	cd ~/uefi-code/ && \
 	echo 'python gen_loader_hikey.py -o l-loader.bin --img_loader=temp --img_bl1=bl1.bin --img_ns_bl1u=fastboot.bin' >> build_uefi.sh &&\
 	chmod +x build_uefi.sh
 
+
+ENTRYPOINT cd ~/uefi-code && ./build_uefi.sh ; /bin/bash
