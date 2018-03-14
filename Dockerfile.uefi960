@@ -1,0 +1,54 @@
+#
+# Dockerfile.kernel: Multi-arch Kernel Build environment
+#
+FROM ubuntu:16.04
+MAINTAINER John Stultz <john.stultz@linaro.org>
+ENV TERM xterm
+# Update the image to the lastest updates
+RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
+# Get tools
+RUN apt-get update && apt-get install -y \
+	bc \
+	gcc \
+	gdisk \
+	git \
+	g++ \
+	libncurses5-dev \
+	libssl-dev \
+	make \
+	python \
+	python-pycurl \
+	python-crypto \
+	uuid-dev \
+	sudo \
+	wget \
+	vim \
+	xz-utils
+
+# make username a variable, so the script is portable
+# add '--build-arg user_name=$USER' to the docker build command
+ARG --description="user name for container" user_name=docker
+
+# Add $user_name user
+RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
+
+RUN	mkdir -p /opt/toolchain/ && cd /opt/toolchain/ && \
+	wget  http://releases.linaro.org/components/toolchain/binaries/7.2-2017.11/aarch64-linux-gnu/gcc-linaro-7.2.1-2017.11-x86_64_aarch64-linux-gnu.tar.xz && \
+	tar -xf gcc-linaro-7.2.1-2017.11-x86_64_aarch64-linux-gnu.tar.xz 
+
+
+USER $user_name
+
+RUN cd ~ && mkdir uefi-code && cd uefi-code && \
+	git clone https://github.com/ARM-software/arm-trusted-firmware -b integration && \
+	git clone https://github.com/96boards-hikey/edk2 -b testing/hikey960_v2.5 && \
+	git clone https://github.com/96boards-hikey/OpenPlatformPkg -b testing/hikey960_v1.3.4 && \
+	git clone https://github.com/96boards-hikey/l-loader -b testing/hikey960_v1.2 && \
+	git clone https://git.linaro.org/uefi/uefi-tools && \
+	git clone https://github.com/96boards-hikey/atf-fastboot && \
+	git clone https://github.com/OP-TEE/optee_os.git
+
+RUN	cd ~/uefi-code/edk2 && ln -sf ../OpenPlatformPkg
+
+
+ENTRYPOINT cd ~/uefi-code ; /bin/bash
