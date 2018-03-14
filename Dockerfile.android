@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y \
 	mtools \
 	openjdk-9-jdk-headless \
 	python \
+	python3 \
 	python-mako \
 	unzip \
 	uuid-dev \
