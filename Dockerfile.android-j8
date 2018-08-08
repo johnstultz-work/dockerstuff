@@ -46,12 +46,12 @@ RUN apt-get update && apt-get install -y \
 	x11proto-core-dev \
 	xsltproc \
 	zip \
-	zlib1g-dev \
+	zlib1g-dev
 
 
 # make username a variable, so the script is portable
 # add '--build-arg user_name=$USER' to the docker build command
-ARG --description="user name for container" user_name=docker
-RUN useradd -m $user_name
-RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/$user_name/.bashrc
+#ARG --description="user name for container" user_name=docker
+RUN useradd -m docker
+RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/docker/.bashrc
 
