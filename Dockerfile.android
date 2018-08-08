@@ -1,6 +1,14 @@
 #
 # Dockerfile.android: Android build environment
 #
+# This enviroment expects TARGET and COMMAND envronment variables to be passed
+# TARGET:  Android lunch target.
+# COMMAND: Command to run in Android directory. After running lunch. Most
+#          likely this should be something like "make -j24"
+#
+# Example usage:
+#    docker run -i -t -e TARGET="hikey-userdebug" -e COMMAND="make -j24" -v $PWD:/home/docker/android <docker img name>
+#
 FROM ubuntu:16.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm
@@ -51,3 +59,16 @@ ARG --description="user name for container" user_name=docker
 RUN useradd -m $user_name
 RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/$user_name/.bashrc
 
+# create run-script
+run echo '#!/bin/bash' > /home/$user_name/run-script.sh
+run echo 'if [ -z $TARGET ]; then echo "No TARGET value"; exit; fi' >> /home/$user_name/run-script.sh
+run echo 'if [[ -z "${COMMAND}" ]]; then echo "No COMMAND value"; exit; fi' >> /home/$user_name/run-script.sh
+run echo 'cd android' >> /home/$user_name/run-script.sh
+run echo '. build/envsetup.sh' >> /home/$user_name/run-script.sh
+run echo 'lunch $TARGET' >> /home/$user_name/run-script.sh
+run echo '$COMMAND' >> /home/$user_name/run-script.sh
+run chmod +x /home/$user_name/run-script.sh
+
+WORKDIR /home/$user_name
+USER $user_name
+CMD ./run-script.sh
