@@ -1,4 +1,5 @@
 #
+# Add cross-build environment scripts
 # Dockerfile.kernel: Multi-arch Kernel Build environment
 #
 FROM ubuntu:16.04
@@ -12,6 +13,7 @@ RUN apt-get update && apt-get install -y \
 	gcc \
 	gcc-arm-linux-gnueabi \
 	gcc-aarch64-linux-gnu \
+	git \
 	libssl-dev \
 	libncurses5-dev \
 	make \
@@ -25,27 +27,37 @@ ARG --description="user name for container" user_name=docker
 RUN useradd -m $user_name
 USER $user_name
 
-# Add cross-build environment scripts
+RUN cd ~/ ; git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
+RUN cd ~/ ; git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
+
 RUN mkdir /home/$user_name/bin
+
+# Add cross-build environment scripts
+RUN echo '#!/bin/bash' > /home/$user_name/bin/clangenv.sh
+RUN echo 'export TOOLCHAIN="clang-r349610"' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export C_COMPILER="clang"' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export PATH=${PWD}/aarch64-linux-android-4.9/bin/:${PWD}/linux-x86/${TOOLCHAIN}/bin/:${PATH}' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export CLANG_TRIPLE=aarch64-linux-gnu-' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export CROSS_COMPILE=aarch64-linux-android-' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export ARCH=arm64' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export CC=clang' >> /home/$user_name/bin/clangenv.sh
+RUN echo 'export HOSTCC=clang' >> /home/$user_name/bin/clangenv.sh
+
 RUN echo '#!/bin/bash' > /home/$user_name/bin/armenv.sh
 RUN echo 'export ARCH="arm"' >> /home/$user_name/bin/armenv.sh
 RUN echo 'export CROSS_COMPILE="arm-linux-gnueabi-"' >> /home/$user_name/bin/armenv.sh
-RUN echo 'bash' >>  /home/$user_name/bin/armenv.sh
-RUN chmod +x /home/$user_name/bin/armenv.sh
 
 RUN echo '#!/bin/bash' > /home/$user_name/bin/arm64env.sh
 RUN echo 'export ARCH="arm64"' >> /home/$user_name/bin/arm64env.sh
 RUN echo 'export CROSS_COMPILE="aarch64-linux-gnu-"' >> /home/$user_name/bin/arm64env.sh
-RUN echo 'bash' >>  /home/$user_name/bin/arm64env.sh
-RUN chmod +x /home/$user_name/bin/arm64env.sh
 
 # create run-script
 run echo '#!/bin/bash' > /home/$user_name/run-script.sh
+run echo 'if [ -z $TARGET ]; then echo "No TARGET value"; exit; fi' >> /home/$user_name/run-script.sh
 run echo 'if [[ -z "${COMMAND}" ]]; then echo "No COMMAND value"; exit; fi' >> /home/$user_name/run-script.sh
-run echo 'export ARCH="arm64"' >> /home/$user_name/run-script.sh
-run echo 'export CROSS_COMPILE="aarch64-linux-gnu-"' >> /home/$user_name/run-script.sh
+run echo '. ~/bin/${TARGET}env.sh' >> /home/$user_name/run-script.sh
 run echo 'cd kernel' >> /home/$user_name/run-script.sh
-run echo '$COMMAND' >> /home/$user_name/run-script.sh
+run echo 'eval ${COMMAND}' >> /home/$user_name/run-script.sh
 run chmod +x /home/$user_name/run-script.sh
 
 WORKDIR /home/$user_name
