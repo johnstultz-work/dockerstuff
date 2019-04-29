@@ -1,7 +1,7 @@
 #
 # Dockerfile.kernel: Multi-arch Kernel Build environment
 #
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm
 # Update the image to the lastest updates
@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
 	gcc \
 	gcc-arm-linux-gnueabi \
 	gcc-aarch64-linux-gnu \
+	libssl-dev \
 	libncurses5-dev \
 	make \
 	python
@@ -37,4 +38,17 @@ RUN echo 'export ARCH="arm64"' >> /home/$user_name/bin/arm64env.sh
 RUN echo 'export CROSS_COMPILE="aarch64-linux-gnu-"' >> /home/$user_name/bin/arm64env.sh
 RUN echo 'bash' >>  /home/$user_name/bin/arm64env.sh
 RUN chmod +x /home/$user_name/bin/arm64env.sh
+
+# create run-script
+run echo '#!/bin/bash' > /home/$user_name/run-script.sh
+run echo 'if [[ -z "${COMMAND}" ]]; then echo "No COMMAND value"; exit; fi' >> /home/$user_name/run-script.sh
+run echo 'export ARCH="arm64"' >> /home/$user_name/run-script.sh
+run echo 'export CROSS_COMPILE="aarch64-linux-gnu-"' >> /home/$user_name/run-script.sh
+run echo 'cd kernel' >> /home/$user_name/run-script.sh
+run echo '$COMMAND' >> /home/$user_name/run-script.sh
+run chmod +x /home/$user_name/run-script.sh
+
+WORKDIR /home/$user_name
+USER $user_name
+CMD ./run-script.sh
 
