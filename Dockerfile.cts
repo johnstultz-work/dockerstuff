@@ -16,16 +16,21 @@ RUN apt-get update && apt-get install -y \
 	aapt \
 	adb \
 	openjdk-8-jdk \
-	unzip
+	unzip\
+	sudo
 
 # make username a variable, so the script is portable
 # add '--build-arg user_name=$USER' to the docker build command
 ARG --description="user name for container" user_name=docker
-RUN useradd -m $user_name
+
+# Add $user_name user
+RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
+
 RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/$user_name/.bashrc
 
 ADD https://dl.google.com/dl/android/cts/android-cts-7.1_r1-linux_x86-x86.zip /home/$user_name/
 ADD https://dl.google.com/dl/android/cts/android-cts-7.1_r1-linux_x86-arm.zip /home/$user_name/
+ADD https://dl.google.com/dl/android/cts/android-cts-9.0_r7-linux_x86-arm.zip /home/$user_name/
 RUN chown $user_name.$user_name /home/$user_name/android-cts*
 
 USER $user_name
