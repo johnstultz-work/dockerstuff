@@ -1,0 +1,49 @@
+#
+# Dockerfile.ubuntu-dev: General Ubuntu dev eenvironment w/ sudo rights
+#
+FROM ubuntu:20.04
+MAINTAINER John Stultz <john.stultz@linaro.org>
+ENV TERM xterm
+# Update the image to the lastest updates
+RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
+
+ARG DEBIAN_FRONTEND=noninteractive
+# Get tools
+RUN apt-get update && apt-get install -y \
+	bc \
+	cpio \
+	gcc \
+	git \
+	golang \
+	kmod \
+	libelf-dev \
+	libncurses5-dev \
+	libssl-dev \
+	make \
+	python \
+	rsync \
+	sudo \
+	vim
+
+
+# make username a variable, so the script is portable
+# add '--build-arg user_name=$USER' to the docker build command
+ARG --description="user name for container" user_name=docker
+
+# Add $user_name user
+RUN useradd -m $user_name && echo "$user_name:docker" | chpasswd && adduser $user_name sudo
+USER $user_name
+RUN go get -u webwormhole.io/cmd/ww
+
+
+run echo '#!/bin/bash' > /home/$user_name/run-script.sh
+run echo 'if [[ -z "${COMMAND}" ]]; then echo "No COMMAND value"; exit; fi' >> /home/$user_name/run-script.sh
+run echo 'cd data' >> /home/$user_name/run-script.sh
+run echo '$COMMAND' >> /home/$user_name/run-script.sh
+run chmod +x /home/$user_name/run-script.sh
+
+WORKDIR /home/$user_name
+CMD ./run-script.sh
+
+
+
