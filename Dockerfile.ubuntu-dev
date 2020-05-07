@@ -1,7 +1,7 @@
 #
 # Dockerfile.ubuntu-dev: General Ubuntu dev eenvironment w/ sudo rights
 #
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm
 # Update the image to the lastest updates
@@ -9,11 +9,19 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y aut
 # Get tools
 RUN apt-get update && apt-get install -y \
 	bc \
+	cpio \
 	gcc \
+	git \
+	kmod \
+	libelf-dev \
 	libncurses5-dev \
+	libssl-dev \
 	make \
 	python \
-	sudo
+	rsync \
+	sudo \
+	vim
+
 
 # make username a variable, so the script is portable
 # add '--build-arg user_name=$USER' to the docker build command
