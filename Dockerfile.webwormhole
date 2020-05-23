@@ -37,6 +37,7 @@ RUN go get -u webwormhole.io/cmd/ww
 
 
 run echo '#!/bin/bash' > /home/$user_name/run-script.sh
+run echo 'export PATH=$PATH:~/go/bin/' >> /home/$user_name/run-script.sh
 run echo 'if [[ -z "${COMMAND}" ]]; then echo "No COMMAND value"; exit; fi' >> /home/$user_name/run-script.sh
 run echo 'cd data' >> /home/$user_name/run-script.sh
 run echo '$COMMAND' >> /home/$user_name/run-script.sh
