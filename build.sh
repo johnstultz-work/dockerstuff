@@ -3,15 +3,18 @@
 USER=`whoami`
 LIST=`ls Dockerfile* | sed -e 's/Dockerfile.//'`
 
-#NO_CACHE="--no-cache"
-NO_CACHE=""
-
-if [ "$1" != "" ]
-then
+if [[ "$1" == "--no-cache" ]]; then
+  NO_CACHE="--no-cache"
+  if [["$2" != "" ]]; then
+	LIST=$2
+  fi
+else
+  if [[ "$1" != "" ]]; then
 	LIST=$1
+  fi
 fi
 
 for i in $LIST
 do
-	docker build $NO_CACHE -t $USER/$i . -f Dockerfile.$i
+	docker build $NO_CACHE -t $USER/$i -f Dockerfile.$i  .
 done
