@@ -26,7 +26,7 @@ RUN echo 'export PATH="/usr/sbin/:/sbin/:$PATH"' >> /home/$user_name/.bashrc
 #ADD https://dl.google.com/dl/android/cts/android-cts-9.0_r7-linux_x86-arm.zip /home/$user_name/
 
 #ADD http://testdata.linaro.org/lkft/aosp-stable/aosp-master-throttled/6832201/test_suites_arm64/android-cts.zip  /home/$user_name/
-ADD android-cts.zip  /home/$user_name/
+ADD android-vts.zip  /home/$user_name/
 ADD https://dl.google.com/android/repository/platform-tools-latest-linux.zip /home/$user_name/
 RUN chown $user_name.$user_name /home/$user_name/*.zip
 
@@ -34,17 +34,18 @@ RUN chown $user_name.$user_name /home/$user_name/*.zip
 USER $user_name
 WORKDIR /home/$user_name
 
-run echo '#!/bin/bash'				>> /home/$user_name/cts.sh 
-run echo 'export PATH=$PATH:~/platform-tools/'	>> /home/$user_name/cts.sh
-run echo 'adb devices'				>> /home/$user_name/cts.sh
-run echo 'if [[ -z "${ARGS}" ]]; then echo "No ARGS value"; exit; fi' >> /home/$user_name/cts.sh
-run echo './android-cts/tools/cts-tradefed run cts  --abi arm64-v8a $ARGS --disable-reboot' >> /home/$user_name/cts.sh
-run chmod +x /home/$user_name/cts.sh
+run echo '#!/bin/bash'				>> /home/$user_name/vts.sh 
+run echo 'export PATH=$PATH:~/platform-tools/'	>> /home/$user_name/vts.sh
+run echo 'adb devices'				>> /home/$user_name/vts.sh
+run echo 'if [[ -z "${ARGS}" ]]; then echo "No ARGS value"; exit; fi' >> /home/$user_name/vts.sh
+run echo './android-vts/tools/vts-tradefed run cts  --abi arm64-v8a $ARGS --disable-reboot' >> /home/$user_name/vts.sh
+run chmod +x /home/$user_name/vts.sh
 
 # Unzup zip files
 RUN	cd ~/ && \
 	mkdir bin && \
-	unzip android-cts.zip && \
+	unzip android-vts.zip && \
 	unzip platform-tools-latest-linux.zip
 
-CMD ./cts.sh ; /bin/bash
+	
+CMD ./vts.sh ; /bin/bash
