@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
 	cpio \
 	flex \
 	bison \
+	clang-format-10 \
 	gcc \
 	gcc-arm-linux-gnueabi \
 	gcc-aarch64-linux-gnu \
