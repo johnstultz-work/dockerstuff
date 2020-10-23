@@ -8,6 +8,7 @@ ENV TERM xterm
 RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
 # Get tools
 RUN apt-get update && apt-get install -y \
+	autoconf \
 	bc \
 	bison \
 	cpio \
@@ -19,12 +20,15 @@ RUN apt-get update && apt-get install -y \
 	libelf-dev \
 	libncurses5-dev \
 	libssl-dev \
+	libtool \
+	libxml2-dev \
 	make \
 	python \
 	python3 \
 	rsync \
 	sudo \
-	vim
+	vim \
+	zlib1g-dev
 
 
 # make username a variable, so the script is portable
