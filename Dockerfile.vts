@@ -38,7 +38,7 @@ run echo '#!/bin/bash'				>> /home/$user_name/vts.sh
 run echo 'export PATH=$PATH:~/platform-tools/'	>> /home/$user_name/vts.sh
 run echo 'adb devices'				>> /home/$user_name/vts.sh
 run echo 'if [[ -z "${ARGS}" ]]; then echo "No ARGS value"; exit; fi' >> /home/$user_name/vts.sh
-run echo './android-vts/tools/vts-tradefed run cts  --abi arm64-v8a $ARGS --disable-reboot' >> /home/$user_name/vts.sh
+run echo './android-vts/tools/vts-tradefed run vts  --abi arm64-v8a $ARGS --disable-reboot' >> /home/$user_name/vts.sh
 run chmod +x /home/$user_name/vts.sh
 
 # Unzup zip files
