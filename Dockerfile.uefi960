@@ -42,11 +42,12 @@ RUN	mkdir -p /opt/toolchain/ && cd /opt/toolchain/ && \
 USER $user_name
 
 RUN cd ~ && mkdir uefi-code && cd uefi-code && \
-	git clone https://github.com/ARM-software/arm-trusted-firmware -b integration && \
+	git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git -b integration && \
+	mv trusted-firmware-a arm-trusted-firmware && \
 	git clone https://github.com/96boards-hikey/edk2 -b testing/hikey960_v2.5 && \
 	git clone https://github.com/96boards-hikey/OpenPlatformPkg -b testing/hikey960_v1.3.4 && \
 	git clone https://github.com/96boards-hikey/l-loader -b testing/hikey960_v1.2 && \
-	git clone https://github.com/OP-TEE/optee_os.git
+	git clone https://github.com/OP-TEE/optee_os.git -b 3.0.0
 
 RUN	cd ~/uefi-code/edk2 && ln -sf ../OpenPlatformPkg
 
