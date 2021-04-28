@@ -38,7 +38,7 @@ run echo '#!/bin/bash'				>> /home/$user_name/cts.sh
 run echo 'export PATH=$PATH:~/platform-tools/'	>> /home/$user_name/cts.sh
 run echo 'adb devices'				>> /home/$user_name/cts.sh
 run echo 'if [[ -z "${ARGS}" ]]; then echo "No ARGS value"; exit; fi' >> /home/$user_name/cts.sh
-run echo './android-cts/tools/cts-tradefed run cts  --abi arm64-v8a $ARGS --disable-reboot' >> /home/$user_name/cts.sh
+run echo './android-cts/tools/cts-tradefed run commandAndExit cts --abi arm64-v8a $ARGS --disable-reboot' >> /home/$user_name/cts.sh
 run chmod +x /home/$user_name/cts.sh
 
 # Unzup zip files
@@ -47,4 +47,4 @@ RUN	cd ~/ && \
 	unzip android-cts.zip && \
 	unzip platform-tools-latest-linux.zip
 
-CMD ./cts.sh ; /bin/bash
+CMD ./cts.sh
