@@ -9,4 +9,4 @@ fi
 
 CMD="${@:2}"
 
-docker run -i -t -e TARGET="$1-userdebug" -e COMMAND="$CMD" -v $PWD:/home/docker/android $USER/android
+docker run -i -t --privileged -v /dev/bus/usb:/dev/bus/usb -e TARGET="$1-userdebug" -e COMMAND="$CMD" -v $PWD:/home/docker/android $USER/android
