@@ -9,50 +9,49 @@
 # Example usage:
 #    docker run -i -t -e TARGET="hikey-userdebug" -e COMMAND="make -j24" -v $PWD:/home/docker/android <docker img name>
 #
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 MAINTAINER John Stultz <john.stultz@linaro.org>
 ENV TERM xterm
+
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Update the image to the lastest updates
 RUN apt-get update && apt-get -y dist-upgrade && apt-get clean && apt-get -y autoremove
 
-# Get dependencies
+# Get dependencies suggested by Google
+# https://source.android.com/setup/build/initializing
 RUN apt-get update && apt-get install -y \
-	bc \
-	bison \
-	build-essential \
-	ccache \
-	curl \
-	dosfstools \
-	flex \
-	g++-multilib \
-	gcc \
-	gcc-4.8 \
-	gcc-multilib \
-	gettext \
-	gdisk \
 	git-core \
 	gnupg \
-	gperf \
-	lib32ncurses5-dev \
-	lib32z-dev \
-	libc6-dev-i386 \
-	libgl1-mesa-dev \
-	libssl-dev \
-	libx11-dev \
-	libxml2-utils \
-	make \
-	mtools \
-	openjdk-9-jdk-headless \
-	python \
-	python3 \
-	python-mako \
-	repo \
-	unzip \
-	uuid-dev \
-	x11proto-core-dev \
-	xsltproc \
+	flex \
+	bison \
+	build-essential \
 	zip \
-	zlib1g-dev
+	curl \
+	zlib1g-dev gcc-multilib \
+	g++-multilib \
+	libc6-dev-i386 \
+	libncurses5 \
+	lib32ncurses5-dev \
+	x11proto-core-dev \
+	libx11-dev \
+	lib32z1-dev \
+	libgl1-mesa-dev \
+	libxml2-utils \
+	xsltproc \
+	unzip \
+	fontconfig
+
+# Get extra bits (mostly for mesa3d main branch testing)
+RUN apt-get install -y \
+	gettext \
+	meson \
+	pkg-config \
+	python3-dev \
+	python3-mako \
+	python-is-python3
+
+
 
 # make username a variable, so the script is portable
 # add '--build-arg user_name=$USER' to the docker build command
